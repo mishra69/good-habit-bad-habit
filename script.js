@@ -1,5 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
     let draggedNote = null;
+    let isDragging = false;
+    let startY = 0;
 
     // Initialize the page based on localStorage or default state
     initializeFromStorage();
@@ -20,10 +22,29 @@ document.addEventListener("DOMContentLoaded", () => {
         // Touch events for mobile
         note.addEventListener("touchstart", (event) => {
             draggedNote = event.target;
+            isDragging = true;
+            startY = event.touches[0].clientY;
             event.target.classList.add("being-touched");
-        }, { passive: true });
+            // Prevent default to stop scrolling while starting drag
+            event.preventDefault();
+        }, { passive: false });
+
+        note.addEventListener("touchmove", (event) => {
+            if (isDragging) {
+                // Calculate how far we've moved
+                const deltaY = Math.abs(event.touches[0].clientY - startY);
+                
+                // If we've moved more than 10px, it's a drag not a tap
+                if (deltaY > 10) {
+                    // Prevent scrolling during drag
+                    event.preventDefault();
+                }
+            }
+        }, { passive: false });
 
         note.addEventListener("touchend", (event) => {
+            if (!isDragging) return;
+            
             const touch = event.changedTouches[0];
             const elementsAtPoint = document.elementsFromPoint(touch.clientX, touch.clientY);
             
@@ -50,6 +71,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
             draggedNote.classList.remove("being-touched");
             draggedNote = null;
+            isDragging = false;
+        });
+
+        note.addEventListener("touchcancel", (event) => {
+            if (draggedNote) {
+                draggedNote.classList.remove("being-touched");
+                draggedNote = null;
+                isDragging = false;
+            }
         });
     }
 
@@ -58,7 +88,15 @@ document.addEventListener("DOMContentLoaded", () => {
         addNoteEventListeners(note);
     });
 
+    // Prevent default touchmove on containers to avoid scrolling while dragging
     document.querySelectorAll(".drop-area, .stack").forEach(area => {
+        area.addEventListener("touchmove", (event) => {
+            if (isDragging) {
+                event.preventDefault();
+            }
+        }, { passive: false });
+        
+        // Regular mouse drop events
         area.addEventListener("dragover", (event) => {
             event.preventDefault();
         });
