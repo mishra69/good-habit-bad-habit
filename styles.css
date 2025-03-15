@@ -1,0 +1,62 @@
+.container {
+    display: flex;
+    justify-content: center;
+    gap: 50px;
+}
+
+.stack-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.drop-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px; /* Keeps the drop zones below the stacks */
+}
+
+.stack {
+    width: 120px;
+    min-height: 150px;
+    height: 150px; /* Ensures the stack doesn't shrink */
+    border: 2px solid black;
+    padding: 10px;
+    background-color: #f8f8f8;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+
+.drop-area {
+    width: 120px;
+    min-height: 150px;
+    border: 2px dashed black;
+    padding: 10px;
+    background-color: #f0f0f0;
+    display: flex;
+    flex-direction: column;
+    gap: 5px; /* Adds spacing between notes */
+}
+
+.note {
+    width: 100px;
+    height: 50px;
+    cursor: grab;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: white;
+    border-radius: 5px;
+}
+
+.red {
+    background-color: red;
+}
+
+.blue {
+    background-color: blue;
+}
