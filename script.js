@@ -64,7 +64,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if ((dropZone.classList.contains("drop-area") || dropZone.classList.contains("stack")) 
                     && dropZoneColor === noteColor) {
                     dropZone.appendChild(draggedNote);
-                    updateCount();
+                    updateCounts();
                     saveState();
                 }
             }
@@ -117,20 +117,47 @@ document.addEventListener("DOMContentLoaded", () => {
                 dropZone.appendChild(draggedNote);
             }
 
-            updateCount();
+            updateCounts();
             saveState();
         });
     });
 
-    function updateCount() {
-        document.getElementById("red-count").innerText = document.getElementById("red-area").children.length;
-        document.getElementById("blue-count").innerText = document.getElementById("blue-area").children.length;
+    function updateCounts() {
+        // Update individual counts
+        const redCount = document.getElementById("red-area").children.length;
+        const blueCount = document.getElementById("blue-area").children.length;
+        
+        document.getElementById("red-count").innerText = redCount;
+        document.getElementById("blue-count").innerText = blueCount;
+        
+        // Calculate and update net count (G - F, or Blue - Red)
+        const netCount = blueCount - redCount;
+        const netCountElement = document.getElementById("net-counter");
+        
+        // Update value
+        netCountElement.innerText = netCount;
+        
+        // Update styling based on value
+        netCountElement.classList.remove("positive", "negative", "zero");
+        if (netCount > 0) {
+            netCountElement.classList.add("positive");
+        } else if (netCount < 0) {
+            netCountElement.classList.add("negative");
+        } else {
+            netCountElement.classList.add("zero");
+        }
     }
 
     function saveState() {
-        // Save counts
-        localStorage.setItem("redCount", document.getElementById("red-area").children.length);
-        localStorage.setItem("blueCount", document.getElementById("blue-area").children.length);
+        // Save individual counts
+        const redCount = document.getElementById("red-area").children.length;
+        const blueCount = document.getElementById("blue-area").children.length;
+        
+        localStorage.setItem("redCount", redCount);
+        localStorage.setItem("blueCount", blueCount);
+        
+        // Save net count
+        localStorage.setItem("netCount", blueCount - redCount);
         
         // Save distribution of notes
         const redStackCount = document.querySelector(".red-stack").children.length;
@@ -148,7 +175,7 @@ document.addEventListener("DOMContentLoaded", () => {
         
         if (!hasPersistedData) {
             // Use default state - already set in HTML
-            updateCount();
+            updateCounts();
             return;
         }
         
@@ -181,7 +208,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         
         // Update displayed counts
-        updateCount();
+        updateCounts();
     }
 
     function createNote(color, parent) {
