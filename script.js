@@ -4,7 +4,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // Initialize the page based on localStorage or default state
     initializeFromStorage();
 
-    document.querySelectorAll(".note").forEach(note => {
+    // Add event listeners to all notes
+    function addNoteEventListeners(note) {
+        // Mouse drag events
         note.addEventListener("dragstart", (event) => {
             draggedNote = event.target;
             setTimeout(() => event.target.style.display = "none", 0);
@@ -12,7 +14,48 @@ document.addEventListener("DOMContentLoaded", () => {
 
         note.addEventListener("dragend", (event) => {
             event.target.style.display = "block";
+            draggedNote = null;
         });
+
+        // Touch events for mobile
+        note.addEventListener("touchstart", (event) => {
+            draggedNote = event.target;
+            event.target.classList.add("being-touched");
+        }, { passive: true });
+
+        note.addEventListener("touchend", (event) => {
+            const touch = event.changedTouches[0];
+            const elementsAtPoint = document.elementsFromPoint(touch.clientX, touch.clientY);
+            
+            let dropZone = null;
+            // Find if we're over a drop zone or stack
+            for (const element of elementsAtPoint) {
+                if (element.classList.contains("drop-area") || element.classList.contains("stack")) {
+                    dropZone = element;
+                    break;
+                }
+            }
+
+            if (dropZone) {
+                const dropZoneColor = dropZone.getAttribute("data-color");
+                const noteColor = draggedNote.classList.contains("red") ? "red" : "blue";
+
+                if ((dropZone.classList.contains("drop-area") || dropZone.classList.contains("stack")) 
+                    && dropZoneColor === noteColor) {
+                    dropZone.appendChild(draggedNote);
+                    updateCount();
+                    saveState();
+                }
+            }
+
+            draggedNote.classList.remove("being-touched");
+            draggedNote = null;
+        });
+    }
+
+    // Add event listeners to all initial notes
+    document.querySelectorAll(".note").forEach(note => {
+        addNoteEventListeners(note);
     });
 
     document.querySelectorAll(".drop-area, .stack").forEach(area => {
@@ -23,6 +66,8 @@ document.addEventListener("DOMContentLoaded", () => {
         area.addEventListener("drop", (event) => {
             event.preventDefault();
 
+            if (!draggedNote) return;
+            
             let dropZone = event.currentTarget;
             const dropZoneColor = dropZone.getAttribute("data-color");
             const noteColor = draggedNote.classList.contains("red") ? "red" : "blue";
@@ -107,14 +152,7 @@ document.addEventListener("DOMContentLoaded", () => {
         note.draggable = true;
         
         // Add event listeners to new notes
-        note.addEventListener("dragstart", (event) => {
-            draggedNote = event.target;
-            setTimeout(() => event.target.style.display = "none", 0);
-        });
-
-        note.addEventListener("dragend", (event) => {
-            event.target.style.display = "block";
-        });
+        addNoteEventListeners(note);
         
         parent.appendChild(note);
         return note;
