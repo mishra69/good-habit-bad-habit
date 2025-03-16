@@ -8,44 +8,36 @@
 </head>
 <body>
     <div class="container">
-        <!-- Red Stack + Drop Zone -->
-        <div class="stack-drop-wrapper">
-            <div class="stack-container">
-                <h3>Red Stack</h3>
-                <div class="stack red-stack" data-color="red">
-                    <div class="note red" draggable="true"></div>
-                    <div class="note red" draggable="true"></div>
-                    <div class="note red" draggable="true"></div>
-                </div>
-            </div>
-            <div class="drop-container">
-                <h3>F Area</h3>
-                <div id="red-area" class="drop-area red-area" data-color="red"></div>
-                <p>Count: <span id="red-count">0</span></p>
+        <!-- Red Stack -->
+        <div class="stack-container">
+            <h3>Bad Habit</h3>
+            <div class="stack red-stack" data-color="red">
+                <div class="note red" draggable="true"></div>
+                <div class="note red" draggable="true"></div>
+                <div class="note red" draggable="true"></div>
             </div>
         </div>
 
-        <!-- Blue Stack + Drop Zone -->
-        <div class="stack-drop-wrapper">
-            <div class="stack-container">
-                <h3>Blue Stack</h3>
-                <div class="stack blue-stack" data-color="blue">
-                    <div class="note blue" draggable="true"></div>
-                    <div class="note blue" draggable="true"></div>
-                    <div class="note blue" draggable="true"></div>
-                </div>
-            </div>
-            <div class="drop-container">
-                <h3>G Area</h3>
-                <div id="blue-area" class="drop-area blue-area" data-color="blue"></div>
-                <p>Count: <span id="blue-count">0</span></p>
+        <!-- Blue Stack -->
+        <div class="stack-container">
+            <h3>Good Habit</h3>
+            <div class="stack blue-stack" data-color="blue">
+                <div class="note blue" draggable="true"></div>
+                <div class="note blue" draggable="true"></div>
+                <div class="note blue" draggable="true"></div>
             </div>
         </div>
     </div>
     
+    <!-- Single Drop Zone -->
+    <div class="unified-drop-container">
+        <h3>Habit Balance Area</h3>
+        <div id="balance-area" class="drop-area balance-area" data-accept-all="true"></div>
+    </div>
+    
     <!-- Net Counter -->
     <div class="net-counter-container">
-        <h3>Net Count (G - F)</h3>
+        <h3>Net Count (Good - Bad)</h3>
         <div id="net-counter" class="net-counter">0</div>
     </div>
     
@@ -54,13 +46,12 @@
         <h3>About This Habit Counter</h3>
         <p>
             Welcome to your personal habit balancer! Blue notes represent positive habits you've completed, 
-            while red notes track habits you're trying to break. Drag notes to their respective areas to 
-            record your progress, and watch your net score increase as good habits outweigh the bad ones. 
-            This simple visual system helps you maintain accountability and celebrate your journey toward 
-            better habits.
+            while red notes track habits you're trying to break. Drag notes to the balance area to 
+            record your progress. Notes of opposite colors will cancel each other out, showing your true 
+            habit balance visually. Watch your net score increase as good habits outweigh the bad ones.
         </p>
     </div>
     
     <script src="script.js"></script>
 </body>
-</html>
+</html> 

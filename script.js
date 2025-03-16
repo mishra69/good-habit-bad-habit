@@ -58,15 +58,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             if (dropZone) {
-                const dropZoneColor = dropZone.getAttribute("data-color");
-                const noteColor = draggedNote.classList.contains("red") ? "red" : "blue";
-
-                if ((dropZone.classList.contains("drop-area") || dropZone.classList.contains("stack")) 
-                    && dropZoneColor === noteColor) {
-                    dropZone.appendChild(draggedNote);
-                    updateCounts();
-                    saveState();
-                }
+                handleDrop(dropZone);
             }
 
             draggedNote.classList.remove("being-touched");
@@ -103,34 +95,97 @@ document.addEventListener("DOMContentLoaded", () => {
 
         area.addEventListener("drop", (event) => {
             event.preventDefault();
-
             if (!draggedNote) return;
             
             let dropZone = event.currentTarget;
-            const dropZoneColor = dropZone.getAttribute("data-color");
-            const noteColor = draggedNote.classList.contains("red") ? "red" : "blue";
-
-            if (dropZone.classList.contains("drop-area") && dropZoneColor === noteColor) {
-                dropZone.appendChild(draggedNote);
-            } 
-            else if (dropZone.classList.contains("stack") && dropZoneColor === noteColor) {
-                dropZone.appendChild(draggedNote);
-            }
-
-            updateCounts();
-            saveState();
+            handleDrop(dropZone);
         });
     });
 
+    function handleDrop(dropZone) {
+        if (!draggedNote) return;
+        
+        // If this is a stack, only allow notes of matching color
+        if (dropZone.classList.contains("stack")) {
+            const dropZoneColor = dropZone.getAttribute("data-color");
+            const noteColor = draggedNote.classList.contains("red") ? "red" : "blue";
+            
+            if (dropZoneColor === noteColor) {
+                dropZone.appendChild(draggedNote);
+                updateCounts();
+                saveState();
+            }
+            return;
+        }
+        
+        // For the balance area (accepts both colors)
+        if (dropZone.classList.contains("balance-area")) {
+            const droppedNoteColor = draggedNote.classList.contains("red") ? "red" : "blue";
+            
+            // Process the balance area logic
+            const balanceArea = document.getElementById("balance-area");
+            const existingNotes = Array.from(balanceArea.children);
+            
+            // If no notes in balance area, simply add the new note
+            if (existingNotes.length === 0) {
+                balanceArea.appendChild(draggedNote);
+            } 
+            // If dropped note is same color as existing notes, simply add it
+            else {
+                const existingNoteColor = existingNotes[0].classList.contains("red") ? "red" : "blue";
+                
+                if (droppedNoteColor === existingNoteColor) {
+                    balanceArea.appendChild(draggedNote);
+                } else {
+                    // If dropped note is opposite color, cancel one out
+                    // Get the first existing note to remove
+                    const noteToRemove = existingNotes[0];
+                    
+                    // Make sure we store the color before removing from DOM
+                    const noteToRemoveColor = noteToRemove.classList.contains("red") ? "red" : "blue";
+                    
+                    // Remove the opposing note from balance area
+                    balanceArea.removeChild(noteToRemove);
+                    
+                    // Put the opposing note back in its stack
+                    if (noteToRemoveColor === "red") {
+                        document.querySelector(".red-stack").appendChild(noteToRemove);
+                    } else {
+                        document.querySelector(".blue-stack").appendChild(noteToRemove);
+                    }
+                    
+                    // Put the dragged note back in its stack
+                    if (droppedNoteColor === "red") {
+                        document.querySelector(".red-stack").appendChild(draggedNote);
+                    } else {
+                        document.querySelector(".blue-stack").appendChild(draggedNote);
+                    }
+                }
+            }
+            
+            updateCounts();
+            saveState();
+        }
+    }
+
     function updateCounts() {
-        // Update individual counts
-        const redCount = document.getElementById("red-area").children.length;
-        const blueCount = document.getElementById("blue-area").children.length;
+        // Count red and blue notes in the balance area
+        const balanceArea = document.getElementById("balance-area");
+        let redCount = 0;
+        let blueCount = 0;
         
-        document.getElementById("red-count").innerText = redCount;
-        document.getElementById("blue-count").innerText = blueCount;
+        Array.from(balanceArea.children).forEach(note => {
+            if (note.classList.contains("red")) {
+                redCount++;
+            } else if (note.classList.contains("blue")) {
+                blueCount++;
+            }
+        });
         
-        // Calculate and update net count (G - F, or Blue - Red)
+        // Due to our cancellation logic, we should only have one type of note
+        // But we calculate both to be safe
+        
+        // Calculate net count (Blue - Red)
         const netCount = blueCount - redCount;
         const netCountElement = document.getElementById("net-counter");
         
@@ -149,17 +204,28 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function saveState() {
-        // Save individual counts
-        const redCount = document.getElementById("red-area").children.length;
-        const blueCount = document.getElementById("blue-area").children.length;
+        const balanceArea = document.getElementById("balance-area");
         
-        localStorage.setItem("redCount", redCount);
-        localStorage.setItem("blueCount", blueCount);
+        // Count notes by color in the balance area
+        let redBalanceCount = 0;
+        let blueBalanceCount = 0;
+        
+        Array.from(balanceArea.children).forEach(note => {
+            if (note.classList.contains("red")) {
+                redBalanceCount++;
+            } else if (note.classList.contains("blue")) {
+                blueBalanceCount++;
+            }
+        });
+        
+        // Save counts of notes in balance area
+        localStorage.setItem("redBalanceCount", redBalanceCount);
+        localStorage.setItem("blueBalanceCount", blueBalanceCount);
         
         // Save net count
-        localStorage.setItem("netCount", blueCount - redCount);
+        localStorage.setItem("netCount", blueBalanceCount - redBalanceCount);
         
-        // Save distribution of notes
+        // Save stack counts
         const redStackCount = document.querySelector(".red-stack").children.length;
         const blueStackCount = document.querySelector(".blue-stack").children.length;
         
@@ -180,31 +246,36 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         
         // Get persisted counts
-        const redCount = parseInt(localStorage.getItem("redCount") || "0");
-        const blueCount = parseInt(localStorage.getItem("blueCount") || "0");
+        const redBalanceCount = parseInt(localStorage.getItem("redBalanceCount") || "0");
+        const blueBalanceCount = parseInt(localStorage.getItem("blueBalanceCount") || "0");
         const redStackCount = parseInt(localStorage.getItem("redStackCount") || "3");
         const blueStackCount = parseInt(localStorage.getItem("blueStackCount") || "3");
         
         // Clear existing notes
         document.querySelector(".red-stack").innerHTML = "";
         document.querySelector(".blue-stack").innerHTML = "";
-        document.getElementById("red-area").innerHTML = "";
-        document.getElementById("blue-area").innerHTML = "";
+        document.getElementById("balance-area").innerHTML = "";
         
-        // Recreate red notes
+        // Recreate red notes in stack
         for (let i = 0; i < redStackCount; i++) {
             createNote("red", document.querySelector(".red-stack"));
         }
-        for (let i = 0; i < redCount; i++) {
-            createNote("red", document.getElementById("red-area"));
-        }
         
-        // Recreate blue notes
+        // Recreate blue notes in stack
         for (let i = 0; i < blueStackCount; i++) {
             createNote("blue", document.querySelector(".blue-stack"));
         }
-        for (let i = 0; i < blueCount; i++) {
-            createNote("blue", document.getElementById("blue-area"));
+        
+        // Recreate notes in balance area
+        // Due to our cancellation logic, we should only have one type of note in the balance area
+        if (redBalanceCount > 0) {
+            for (let i = 0; i < redBalanceCount; i++) {
+                createNote("red", document.getElementById("balance-area"));
+            }
+        } else if (blueBalanceCount > 0) {
+            for (let i = 0; i < blueBalanceCount; i++) {
+                createNote("blue", document.getElementById("balance-area"));
+            }
         }
         
         // Update displayed counts
