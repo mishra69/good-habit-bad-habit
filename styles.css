@@ -1,13 +1,16 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f7fa;
+    color: #333;
+    margin: 0;
+    padding: 20px;
+}
+
 .container {
     display: flex;
     justify-content: center;
     gap: 50px;
-}
-
-.stack-drop-wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    margin-bottom: 30px;
 }
 
 .stack-container {
@@ -16,34 +19,63 @@
     align-items: center;
 }
 
-.drop-container {
+.stack-container h3 {
+    color: #2c3e50;
+    margin-bottom: 12px;
+    font-weight: 600;
+}
+
+.unified-drop-container {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-top: 20px; /* Keeps the drop zones below the stacks */
+    margin: 30px auto;
+    max-width: 300px;
+}
+
+.unified-drop-container h3 {
+    color: #2c3e50;
+    margin-bottom: 12px;
+    font-weight: 600;
 }
 
 .stack {
     width: 120px;
     min-height: 150px;
-    height: 150px; /* Ensures the stack doesn't shrink */
-    border: 2px solid black;
+    height: 150px;
+    border: 2px solid #bdc3c7;
+    border-radius: 8px;
     padding: 10px;
-    background-color: #f8f8f8;
+    background-color: #ecf0f1;
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
 }
 
 .drop-area {
     width: 120px;
     min-height: 150px;
-    border: 2px dashed black;
+    border: 2px dashed #7f8c8d;
+    border-radius: 8px;
     padding: 10px;
-    background-color: #f0f0f0;
+    background-color: #f7f9fc;
     display: flex;
     flex-direction: column;
-    gap: 5px; /* Adds spacing between notes */
+    align-items: center;
+    gap: 10px;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease;
+}
+
+.drop-area:hover {
+    background-color: #edf2f7;
+}
+
+.balance-area {
+    background-color: #f7f9fc;
+    border: 2px dashed #7f8c8d;
 }
 
 .note {
@@ -55,26 +87,35 @@
     justify-content: center;
     font-weight: bold;
     color: white;
-    border-radius: 5px;
-    /* Prevent text selection during dragging */
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: transform 0.15s ease;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
 }
 
+.note:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
 .red {
-    background-color: red;
+    background-color: #e74c3c;
+    background-image: linear-gradient(135deg, #e74c3c, #c0392b);
 }
 
 .blue {
-    background-color: blue;
+    background-color: #3498db;
+    background-image: linear-gradient(135deg, #3498db, #2980b9);
 }
 
 /* Visual feedback for touch interactions */
 .note.being-touched {
-    opacity: 0.7;
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+    opacity: 0.8;
+    transform: scale(1.05);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
 }
 
 /* Net Counter Styling */
@@ -82,60 +123,68 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-top: 30px;
-    padding: 15px;
-    border: 2px solid #333;
-    border-radius: 8px;
-    background-color: #f5f5f5;
+    margin: 30px auto;
+    padding: 20px;
+    border: 2px solid #bdc3c7;
+    border-radius: 10px;
+    background-color: #ffffff;
     max-width: 200px;
-    margin-left: auto;
-    margin-right: auto;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.net-counter-container h3 {
+    color: #2c3e50;
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-weight: 600;
 }
 
 .net-counter {
-    font-size: 24px;
+    font-size: 28px;
     font-weight: bold;
-    padding: 8px 15px;
-    border-radius: 4px;
+    padding: 10px 20px;
+    border-radius: 6px;
     min-width: 60px;
     text-align: center;
+    transition: all 0.3s ease;
 }
 
 .positive {
-    color: green;
-    background-color: #e6ffe6;
+    color: #27ae60;
+    background-color: #e8f8f0;
 }
 
 .negative {
-    color: red;
-    background-color: #ffe6e6;
+    color: #e74c3c;
+    background-color: #fceeec;
 }
 
 .zero {
-    color: #666;
-    background-color: #f0f0f0;
+    color: #7f8c8d;
+    background-color: #f5f7fa;
 }
 
 /* Description Container Styling */
 .description-container {
     max-width: 600px;
     margin: 40px auto 20px;
-    padding: 20px;
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    padding: 25px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     text-align: center;
 }
 
 .description-container h3 {
-    color: #333;
+    color: #2c3e50;
     margin-top: 0;
     margin-bottom: 15px;
+    font-weight: 600;
 }
 
 .description-container p {
-    color: #555;
-    line-height: 1.6;
+    color: #34495e;
+    line-height: 1.7;
     margin: 0;
 }
 
@@ -147,7 +196,7 @@
         gap: 30px;
     }
     
-    .stack-drop-wrapper {
+    .stack-container {
         width: 100%;
         max-width: 300px;
     }
@@ -158,6 +207,6 @@
     
     .description-container {
         margin: 30px 15px 20px;
-        padding: 15px;
+        padding: 20px;
     }
 }
