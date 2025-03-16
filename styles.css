@@ -201,8 +201,17 @@ body {
         max-width: 300px;
     }
     
+    .stack {
+        min-height: 160px; /* Increased height for mobile */
+        height: auto; /* Allow stack to grow if needed */
+        max-height: 200px; /* Set maximum height */
+        overflow-y: auto; /* Add scrolling if notes overflow */
+    }
+    
     .note {
-        min-height: 50px; /* Slightly larger touch target */
+        min-height: 45px; /* Slightly smaller on mobile */
+        height: 45px;
+        margin-bottom: 5px;
     }
     
     .description-container {
